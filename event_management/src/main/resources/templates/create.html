@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <title>Event Management</title>
+  <style>
+
+    #createEventFormContainer {
+        text-align: center; /* Align form content in the center */
+    }
+
+      #createEventForm {
+        border: 1px solid #ccc; /* Border color */
+        padding: 20px;
+        width: 300px;
+        display: inline-block;
+        text-align: left;
+        background-color:#FFE4C9;/* Light background color */
+        border-radius: 8px; /* Rounded corners */
+    }
+
+    #createEventForm label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+ body
+ {
+  background-image:url("20.jpg");
+  background-size:cover;
+ }
+    #createEventForm input[type="text"],
+    #createEventForm input[type="datetime-local"],
+    #createEventForm button {
+        width: calc(100% - 12px);
+        padding: 5px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd; /* Border color for input elements */
+        border-radius: 4px; /* Rounded corners for input elements */
+        box-sizing: border-box; /* Include padding and border in element's total width and height */
+    }
+
+    #createEventForm input[type="text"],
+    #createEventForm input[type="datetime-local"] {
+        background-color: #fff; /* White background color for input elements */
+    }
+
+    #createEventForm button {
+        background-color: #007bff; /* Button background color */
+        color: #fff; /* Button text color */
+        cursor: pointer;
+        border: none;
+        border-radius: 4px; /* Rounded corners for buttons */
+    }
+
+    #createEventForm button:hover {
+        background-color: #0056b3; /* Darker shade of blue on hover */
+    }
+    #li
+    {
+    text-decoration:none;
+    text-color:white;
+    }
+    .ap
+    {
+    color:black;
+    }
+  </style>
+<body>
+
+<div id="createEventFormContainer">
+  <h1 style="color:white;">Event Registration</h1>
+  <form id="createEventForm">
+    <div class="ap">
+    <div class="form-group">
+      <label for="eventName">Name</label>
+      <input type="text" id="eventName" placeholder="Event Name" required>
+    </div>
+    <div class="form-group">
+      <label for="eventDepartment">Department</label>
+      <input type="text" id="eventDepartment" placeholder="Department" required>
+    </div>
+    <div class="form-group">
+      <label for="eventVenue">Venue</label>
+      <input type="text" id="eventVenue" placeholder="Venue" required>
+    </div>
+    <div class="form-group">
+      <label for="eventTime">Event Time</label>
+      <input type="datetime-local" id="eventTime" required>
+    </div>
+    <div class="form-group">
+      <label for="eventLastdate">Last Date</label>
+      <input type="datetime-local" id="eventLastdate" required>
+    </div>
+    <div class="form-group">
+      <label for="eventRegistrationlink">Registration Link</label>
+      <input type="text" id="eventRegistrationlink" placeholder="Registration Link" required>
+    </div>
+    </div>
+    <button type="submit"><a href="index.html" id="li">Create Event</a></button>
+  </form>
+</div>
+
+</body>
+    <script>
+    document.getElementById('createEventForm').addEventListener('submit', function(event) {
+event.preventDefault();
+
+const eventName = document.getElementById('eventName').value;
+const eventDepartment = document.getElementById('eventDepartment').value;
+const eventVenue = document.getElementById('eventVenue').value;
+const eventTime = document.getElementById('eventTime').value;
+const eventLastdate = document.getElementById('eventLastdate').value;
+const eventRegistrationlink = document.getElementById('eventRegistrationlink').value;
+
+fetch('http://localhost:8083/v1/events', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({
+name: eventName,
+department: eventDepartment,
+venue: eventVenue,
+time: eventTime,
+lastdate: eventLastdate,
+registrationlink: eventRegistrationlink // Updated property name
+})
+})
+.then(response => {
+if (response.ok) {
+fetchEvents(); // Refresh the events table
+} else {
+throw new Error('Failed to create event');
+}
+})
+.catch(error => console.error('Error creating event:', error));
+});
+    </script>
+
+</html>

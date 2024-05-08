@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Event Management</title>
+    <style>
+        body
+        {
+        height:500px;
+        overflow:contain;
+        }
+        body {
+
+                   margin: 0;
+                   padding: 0;
+                   overflow: hidden;
+               }
+
+               body::before {
+                   content: "";
+                   position: fixed;
+                   top: 0;
+                   left: 0;
+                   width: 100%;
+                   height: 100%;
+                   background-image: url("eagle.jpg");
+                   background-size: cover;
+                   filter: blur(5px); /* Adjust the blur radius as needed */
+                   z-index: -1;
+               }
+
+
+          .delete-button {
+                   background-color: #ff9999; /* Light red color for delete button */
+                   color: black; /* Darker text color for delete button */
+                   border: none;
+                   padding: 8px 16px;
+                   border-radius: 4px;
+                   cursor: pointer;
+               }
+
+               .delete-button:hover {
+                   background-color: #ff6666; /* Darker shade of red on hover */
+               }
+
+               .update-button {
+                   background-color: #ffff99; /* Light yellow color for update button */
+                   color: black; /* Darker text color for update button */
+                   border: none;
+                   padding: 8px 16px;
+                   border-radius: 4px;
+                   cursor: pointer;
+               }
+
+               .update-button:hover {
+                   background-color: #ffff66; /* Darker shade of yellow on hover */
+               }
+
+.tablecontainer
+{
+height:2000px;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+        #eventsTable {
+            border-collapse: collapse;
+            width: 80%;
+            margin-top:100px;
+            margin-down:2000px;
+            margin-left:150px;
+            overflow:scroll;
+            opacity:1.0;
+            background-color:white;
+            position:relative;
+<!--background-color:rgb(174, 203, 213);-->
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #343a40; /* Dark background color for table header */
+            color: white; /* Text color for table header */
+        }
+
+        tr:hover {
+            background-color: #f5f5f5; /* Hover background color for table rows */
+        }
+         #createEventFormContainer {
+            text-align: center; /* Align form content in the center */
+        }
+
+
+
+             .fa-icon {
+                   position: absolute;
+                   top: 50%;
+                   transform: translateY(-50%);
+                   left: 6px;
+                   color: #777;
+                   font-size: 16px; /* Adjust icon size */
+               }
+.login {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+         border: 1px solid #ccc;
+         border-radius: 10px;
+         padding: 50px;
+         max-width: 400px;
+         margin:auto;
+         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+       }
+.id a{
+        text-decoration:none;
+        color:white;
+        }
+        .id
+        {
+         position: absolute;
+            top: 35px;
+            right: 10px;
+        }
+        .table-container
+        {
+
+        }
+    </style>
+</head>
+
+
+<body>
+<div class="id">
+<button type="submit" class="btn btn-success" id="login"><a href="create.html"><i class="fas fa-sign-in-alt"></i> Create Event</a></button>
+</div>
+<!-- Table to display existing events -->
+<div class="table-container">
+<table id="eventsTable">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Department</th>
+        <th>Venue</th>
+        <th>Time</th>
+        <th>Last Date</th>
+        <th>Registration Link</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody id="eventsBody">
+    <!-- Events will be populated here -->
+    </tbody>
+</table>
+</div>
+<script>
+    // Function to fetch and display events
+   // Function to fetch and display events
+    function fetchEvents() {
+    fetch('http://localhost:8083/v1/events')
+        .then(response => response.json())
+        .then(events => {
+            const eventsBody = document.getElementById('eventsBody');
+            eventsBody.innerHTML = ''; // Clear existing data
+
+            events.forEach(event => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${event.name}</td>
+                    <td>${event.department}</td>
+                    <td>${event.venue}</td>
+                    <td>${event.time}</td>
+                    <td>${event.lastdate}</td>
+                    <td><a href="${event.registrationlink}" target="_blank">${event.registrationlink}</a></td>
+
+                    <td>
+                        <button class="delete-button" onclick="deleteEvent(${event.id})">Delete</button>
+                        <button class="update-button" onclick="updateEvent(${event.id}, '${event.name}', '${event.department}', '${event.venue}', '${event.time}', '${event.lastdate}', '${event.registrationlink}')">Update</button>
+                    </td>
+                `;
+                eventsBody.appendChild(newRow);
+            });
+        })
+        .catch(error => console.error('Error fetching events:', error));
+}
+
+
+    // Function to delete an event
+    function deleteEvent(eventId) {
+        fetch(`http://localhost:8083/v1/events/${eventId}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                fetchEvents(); // Refresh the events table
+            } else {
+                throw new Error('Failed to delete event');
+            }
+        })
+        .catch(error => console.error('Error deleting event:', error));
+    }
+
+    function updateEvent(eventId, eventName, eventDepartment, eventVenue, eventTime, eventLastdate, eventRegistrationlink) {
+    // Create a form element
+  const form = document.createElement('form');
+    form.id = 'updateEventForm';
+    form.classList.add('update-form'); // Add a class for styling
+
+    // Add box model styling
+     form.style.border = '1px solid #ccc';
+    form.style.padding = '30px';
+    form.style.width = '300px';
+    form.style.position = 'fixed'; // Set the position to fixed
+    form.style.top = '50%'; // Center the form vertically
+    form.style.left = '50%'; // Center the form horizontally
+    form.style.transform = 'translate(-50%, -50%)'; // Center the form both vertically and horizontally
+    form.style.backgroundColor = 'white'; // Background color
+    form.style.borderRadius = '8px';
+    form.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+     form.style.display = 'flex';
+    form.style.flexDirection = 'column';
+
+    // Create input fields for each event detail
+    const nameLabel = document.createElement('label');
+    nameLabel.textContent = 'Name:';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = eventName;
+
+    const departmentLabel = document.createElement('label');
+    departmentLabel.textContent = 'Department:';
+    const departmentInput = document.createElement('input');
+    departmentInput.type = 'text';
+    departmentInput.value = eventDepartment;
+
+    const venueLabel = document.createElement('label');
+    venueLabel.textContent = 'Venue:';
+    const venueInput = document.createElement('input');
+    venueInput.type = 'text';
+    venueInput.value = eventVenue;
+
+    const timeLabel = document.createElement('label');
+    timeLabel.textContent = 'Time:';
+    const timeInput = document.createElement('input');
+    timeInput.type = 'datetime-local';
+    timeInput.value = eventTime;
+
+    const lastdateLabel = document.createElement('label');
+    lastdateLabel.textContent = 'Last Date:';
+    const lastdateInput = document.createElement('input');
+    lastdateInput.type = 'datetime-local';
+    lastdateInput.value = eventLastdate;
+
+    const registrationlinkLabel = document.createElement('label');
+    registrationlinkLabel.textContent = 'Registration Link:';
+    const registrationlinkInput = document.createElement('input');
+    registrationlinkInput.type = 'text';
+    registrationlinkInput.value = eventRegistrationlink;
+
+    // Create a submit button
+       const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.textContent = 'Update Event';
+    submitButton.style.backgroundColor = '#007bff'; // Button background color
+    submitButton.style.color = '#fff'; // Button text color
+    submitButton.style.border = 'none';
+    submitButton.style.borderRadius = '4px'; // Rounded corners for buttons
+    submitButton.style.cursor = 'pointer';
+    submitButton.style.padding = '8px 16px';
+    submitButton.style.marginTop = '10px'
+   // Add Bootstrap button classes
+
+    // Append input fields and button to the form
+    form.append(nameLabel, nameInput, document.createElement('br'));
+    form.append(departmentLabel, departmentInput, document.createElement('br'));
+    form.append(venueLabel, venueInput, document.createElement('br'));
+    form.append(timeLabel, timeInput, document.createElement('br'));
+    form.append(lastdateLabel, lastdateInput, document.createElement('br'));
+    form.append(registrationlinkLabel, registrationlinkInput, document.createElement('br'));
+    form.append(submitButton);
+
+    // Append the form to the document body
+    document.body.appendChild(form);
+
+    // Add event listener for form submission
+    form.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const updatedEvent = {
+            name: nameInput.value,
+            department: departmentInput.value,
+            venue: venueInput.value,
+            time: timeInput.value,
+            lastdate: lastdateInput.value,
+            registrationlink: registrationlinkInput.value
+        };
+
+        fetch(`http://localhost:8083/v1/events/${eventId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedEvent)
+        })
+        .then(response => {
+            if (response.ok) {
+                fetchEvents(); // Refresh the events table
+                // Remove the form after updating the event
+                document.body.removeChild(form);
+            } else {
+                throw new Error('Failed to update event');
+            }
+        })
+        .catch(error => console.error('Error updating event:', error));
+    });
+}
+
+
+
+    fetchEvents();
+</script>
+</body>
+</html>
