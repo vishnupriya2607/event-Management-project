@@ -5,14 +5,13 @@ import com.example.event_management.SERVICE.Event_service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 
 
 @CrossOrigin
 @RestController
-@RequestMapping("/events")
+@RequestMapping("/event")
 
 public class Event_controller {
 
@@ -51,5 +50,4 @@ public class Event_controller {
     public void updateEvent(@PathVariable Long eventId, @RequestBody Event_DTO updatedEvent) {
         eventService.updateEvent(eventId, updatedEvent);
     }
-    // Other CRUD operations
 }
