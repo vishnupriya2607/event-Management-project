@@ -65,5 +65,8 @@ public class Event_DTO {
     public void setRegistrationlink(String registrationlink) {
         this.registrationlink = registrationlink;
     }
+    public void setDate(String date){
+this.date=date;
+    }
 
 }
